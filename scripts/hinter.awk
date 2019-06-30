@@ -143,12 +143,15 @@ BEGIN {
     post_match = substr(output_line, col_pos + RLENGTH, length(line) - 1);
     line_match = substr(line, RSTART, RLENGTH);
 
-    hint = hint_by_match[line_match]
+    trimmed_line_match = line_match
+    gsub(/^[[:space:]]*/, "", trimmed_line_match);
+
+    hint = hint_by_match[trimmed_line_match]
     if (!hint) {
       hint = HINTS[n_matches++]
-      hint_by_match[line_match] = hint
+      hint_by_match[trimmed_line_match] = hint
     }
-    hint_lookup = hint_lookup hint ":" line_match "\n"
+    hint_lookup = hint_lookup hint ":" trimmed_line_match "\n"
 
     if (fingers_compact_hints) {
       hint_len = length(sprintf(hint_format_nocolor, hint))
