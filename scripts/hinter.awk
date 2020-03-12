@@ -58,10 +58,9 @@ BEGIN {
 
   while (match(line, finger_patterns)) {
     n_matches++
-    col_pos = RSTART;
 
-    pre_match = substr(line, 0, col_pos - 1);
-    post_match = substr(line, col_pos + RLENGTH, length(line) - 1);
+    pre_match = substr(line, 0, RSTART - 1);
+    post_match = substr(line, RSTART + RLENGTH, length(line) - 1);
     match_token = substr(line, RSTART, RLENGTH);
 
     tokens_by_line[n_lines][n_tokens]["value"] = pre_match
@@ -106,13 +105,15 @@ END {
       token_type = tokens_by_line[line_index][token_index]["type"]
 
       if (token_type == "match") {
-        hint = hint_by_match[token]
+        trimmed_token = token
+        gsub(/^[[:space:]]*/, "", trimmed_token)
+        hint = hint_by_match[trimmed_token]
 
         if (!hint) {
           hint = hints[hint_index]
-          hint_by_match[token] = hint
+          hint_by_match[trimmed_token] = hint
           hint_index = hint_index + 1
-          hint_lookup = hint_lookup hint ":" token "\n"
+          hint_lookup = hint_lookup hint ":" trimmed_token "\n"
         }
 
         if (selected_hints_lookup[hint]) {
